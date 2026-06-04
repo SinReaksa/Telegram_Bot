@@ -7,7 +7,6 @@ from config import TOKEN
 
 logging.basicConfig(level=logging.INFO)
 
-# Load FAQ JSON safely
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FILE_PATH = os.path.join(BASE_DIR, "faq.json")
 
@@ -22,11 +21,9 @@ def find_answer(text: str):
         question = item["question"].strip().lower()
         keywords = [k.lower() for k in item.get("keywords", [])]
 
-        # exact match only
         if text == question:
             return item["answer"]
 
-        # keyword match only
         for kw in keywords:
             if kw in text:
                 return item["answer"]
