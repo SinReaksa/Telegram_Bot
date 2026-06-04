@@ -1,26 +1,29 @@
+import logging
 from telegram import Update
 from telegram.ext import ContextTypes
-from data import PDF_TEXT
-from ai import ask_ai
+from utils import find_answer
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     await update.message.reply_text(
-        "🤖 AI Bot Ready!\nAsk me anything."
+        "សូមស្វាគមន៍!\n\n"
+        "សួរអំពី KPI, AL, ច្បាប់ឈប់សម្រាក..."
     )
 
 
 async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_text = update.message.text.lower()
 
-    # 1. PDF search first
-    if user_text in PDF_TEXT:
-        await update.message.reply_text("📄 Found in document")
-        return
+    text = update.message.text
+    logging.info("Incoming message: %s", text)
 
-    # 2. AI fallback
-    try:
-        answer = ask_ai(user_text)
+    answer = find_answer(text)
+
+    if answer:
+        logging.info("Replying with answer: %s", answer)
         await update.message.reply_text(answer)
-    except Exception as e:
-        await update.message.reply_text("⚠️ AI error, try again later")
+    else:
+        logging.info("No matching answer found")
+        await update.message.reply_text(
+            "សូមទោស ខ្ញុំមិនស្គាល់សំណួរនេះទេ។"
+        )

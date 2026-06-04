@@ -1,14 +1,7 @@
-import pdfplumber
+import json
 
-def load_pdf():
-    text = ""
+def load_faq():
+    with open("faq.json", "r", encoding="utf-8") as f:
+        return json.load(f)
 
-    with pdfplumber.open("faq.pdf") as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text()
-            if page_text:
-                text += page_text + "\n"
-
-    return text.lower()
-
-PDF_TEXT = load_pdf()
+FAQ = load_faq()
