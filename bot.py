@@ -15,19 +15,28 @@ with open(FILE_PATH, "r", encoding="utf-8") as f:
 
 
 def find_answer(text: str):
-    text = text.strip().lower()
+    text = text.lower().strip()
+    logging.info("find_answer: text=%s", text)
 
     for item in QA_DATA:
-        question = item["question"].strip().lower()
-        keywords = [k.lower() for k in item.get("keywords", [])]
-
-        if text == question:
+        q = item["question"].lower().strip()
+        if text == q:
+            logging.info("find_answer: exact match question=%s", item["question"])
             return item["answer"]
 
-        for kw in keywords:
-            if kw in text:
-                return item["answer"]
+    for item in QA_DATA:
+        q = item["question"].lower().strip()
+        if q in text or text in q:
+            logging.info("find_answer: substring match question=%s", item["question"])
+            return item["answer"]
 
+    for item in QA_DATA:
+        keywords = [k.lower() for k in item.get("keywords", [])]
+        if keywords and all(kw in text for kw in keywords):
+            logging.info("find_answer: keyword match question=%s keywords=%s", item["question"], keywords)
+            return item["answer"]
+
+    logging.info("find_answer: no match")
     return None
 
 
@@ -37,11 +46,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
+    logging.info("Incoming message: %s", text)
     answer = find_answer(text)
 
     if answer:
+        logging.info("Replying with answer: %s", answer)
         await update.message.reply_text(answer)
     else:
+        logging.info("No matching answer found for: %s", text)
         await update.message.reply_text("❌ No answer found")
 
 
