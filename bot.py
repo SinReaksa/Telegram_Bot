@@ -7,7 +7,7 @@ from config import TOKEN
 logging.basicConfig(level=logging.INFO)
 
 # Load JSON data once
-with open("data.json", "r", encoding="utf-8") as f:
+with open("faq.json", "r", encoding="utf-8") as f:
     QA_DATA = json.load(f)
 
 
