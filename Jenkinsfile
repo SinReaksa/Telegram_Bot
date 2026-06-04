@@ -1,4 +1,4 @@
-// Force update: Docker deployment with EC2 + port 9090
+// Telegram Bot / App Deployment to EC2 (Ubuntu)
 
 pipeline {
     agent any
@@ -6,8 +6,8 @@ pipeline {
     environment {
         IMAGE_NAME = "myapp"
         CONTAINER_NAME = "app"
-        EC2_IP     = "13.60.157.119"
-        EC2_USER   = "ec2-user"
+        EC2_IP = "13.60.157.119"
+        EC2_USER = "ubuntu"
     }
 
     stages {
@@ -30,7 +30,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to EC2') {
             steps {
                 withCredentials([file(credentialsId: 'ec2-server-key', variable: 'EC2_KEY')]) {
                     sh '''
@@ -39,7 +39,7 @@ pipeline {
                     echo "Saving Docker image..."
                     docker save -o myapp.tar $IMAGE_NAME
 
-                    echo "Sending to EC2..."
+                    echo "Uploading to EC2..."
                     scp -i $EC2_KEY -o StrictHostKeyChecking=no myapp.tar ${EC2_USER}@${EC2_IP}:/home/${EC2_USER}/myapp.tar
 
                     echo "Deploying on EC2..."
@@ -60,10 +60,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment Successful'
+            echo 'Deployment Successful 🚀'
         }
         failure {
-            echo 'Deployment Failed'
+            echo 'Deployment Failed ❌'
         }
     }
 }
